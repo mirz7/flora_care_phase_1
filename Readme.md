@@ -18,23 +18,24 @@ Currently, the project is in its **initial stage**, built with **Flask** to serv
 * Basic templates for UI
 * Initial dataset and CSV-based information
 * Organized project structure with static & templates folders
-
+* Detailed plant care using hugging face
 ---
 
 ## 📸 Screenshots
 
-*(Add some project photos here — for example, app UI, terminal running Flask, or sample demo images)*
 
-Example:
 
-```
-static/
- ┣ images/
- ┃ ┗ demo_1.jpg
- ┃ ┗ demo_2.jpg
-```
+### 🌱 Home Page
+![Home Page](static/images/1.png)
 
----
+### 🔍 Detection 
+![Detection Demo](static/images/2.png)
+
+### ⚙️ care page
+![Flask Running](static/images/3.png)
+### ⚙️ Care guide
+![Flask Running](static/images/4.png)
+
 
 ## 🔮 Roadmap
 
