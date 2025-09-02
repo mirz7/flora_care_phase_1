@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block pagetitle %}IoT Control - Flora Care{% endblock pagetitle %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2 class="text-center text-success">IoT Control Panel</h2>
+    
+    <!-- Error alert - hidden by default -->
+    <div class="alert alert-danger text-center" id="error-message" style="display: none;">
+        <i class="fa fa-exclamation-triangle"></i> <span id="error-text">Sensor connection lost</span>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4 shadow">
+                <h5 class="text-primary">Soil Moisture: <span id="soil-moisture" class="fw-bold">{{ sensor_data.soil_moisture|default('--') }}%</span></h5>
+                <h5 class="text-primary">Temperature: <span id="temperature" class="fw-bold">{{ sensor_data.temperature|default('--') }}°C</span></h5>
+                
+                <canvas id="sensorChart" class="mt-4"></canvas>
+                
+                <!-- Plant Type Selection -->
+                <div class="form-group mt-4">
+                    <label for="plantType"><strong>Plant Type:</strong></label>
+                    <select class="form-control" id="plantType">
+                        <option value="default">Select Plant Type</option>
+                        <option value="succulents">Succulents (Low Water)</option>
+                        <option value="herbs">Herbs (Medium Water)</option>
+                        <option value="tropical">Tropical Plants (High Water)</option>
+                        <option value="vegetables">Vegetables (Variable)</option>
+                    </select>
+                </div>
+                
+                <!-- Watering Schedule -->
+                <div class="form-group mt-3">
+                    <label><strong>Watering Schedule:</strong></label>
+                    <div class="d-flex justify-content-between mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="monday" name="schedule">
+                            <label class="form-check-label" for="monday">Mon</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="tuesday" name="schedule">
+                            <label class="form-check-label" for="tuesday">Tue</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="wednesday" name="schedule">
+                            <label class="form-check-label" for="wednesday">Wed</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="thursday" name="schedule">
+                            <label class="form-check-label" for="thursday">Thu</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="friday" name="schedule">
+                            <label class="form-check-label" for="friday">Fri</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="saturday" name="schedule">
+                            <label class="form-check-label" for="saturday">Sat</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="sunday" name="schedule">
+                            <label class="form-check-label" for="sunday">Sun</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="wateringTime">Time:</label>
+                            <input type="time" class="form-control" id="wateringTime" value="07:00">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="wateringDuration">Duration (sec):</label>
+                            <input type="number" class="form-control" id="wateringDuration" min="5" max="300" value="30">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-2" id="saveSchedule">Save Schedule</button>
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- Watering Controls -->
+                <div class="d-flex justify-content-between">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="autoMode">
+                        <label class="form-check-label" for="autoMode">Auto Mode</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="wateringToggle">
+                        <label class="form-check-label" for="wateringToggle">Manual Watering</label>
+                    </div>
+                </div>
+                
+                <div id="wateringStatus" class="mt-3 text-center">
+                    <span class="badge bg-secondary">Watering Off</span>
+                </div>
+                
+                <div id="nextWatering" class="mt-2 text-center text-muted small">
+                    Next scheduled watering: Not set
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Error handling for sensor connection
+function updateSensorData() {
+    fetch("/sensor_data")
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Hide error message if it was previously shown
+        document.getElementById("error-message").style.display = "none";
+        
+        // Update UI with sensor data
+        if (data.error) {
+            showError(data.error);
+        } else {
+            document.getElementById("soil-moisture").textContent = data.soil_moisture + "%";
+            document.getElementById("temperature").textContent = data.temperature + "°C";
+            updateChart(data.soil_moisture, data.temperature);
+        }
+    })
+    .catch(error => {
+        console.error("Error fetching sensor data:", error);
+        showError("Sensor connection lost. Please check your devices.");
+    });
+}
+
+function showError(message) {
+    document.getElementById("error-text").textContent = message;
+    document.getElementById("error-message").style.display = "block";
+    
+    document.getElementById("soil-moisture").textContent = "--";
+    document.getElementById("temperature").textContent = "--";
+}
+
+// Update data every 5 seconds
+setInterval(updateSensorData, 5000);
+// Initial update
+updateSensorData();
+
+// Plant type selection handling
+document.getElementById("plantType").addEventListener("change", function() {
+    // You can send plant type to server here
+    let plantType = this.value;
+    if (plantType !== "default") {
+        alert("Plant type set to: " + plantType);
+    }
+});
+
+// Schedule save button
+document.getElementById("saveSchedule").addEventListener("click", function() {
+    let scheduleDays = [];
+    document.querySelectorAll('input[name="schedule"]:checked').forEach(checkbox => {
+        scheduleDays.push(checkbox.id);
+    });
+    
+    let scheduleTime = document.getElementById("wateringTime").value;
+    let duration = document.getElementById("wateringDuration").value;
+    
+    if (scheduleDays.length === 0) {
+        alert("Please select at least one day");
+        return;
+    }
+    
+    // Update UI to show next watering
+    const daysMap = {
+        "monday": 1, "tuesday": 2, "wednesday": 3, "thursday": 4,
+        "friday": 5, "saturday": 6, "sunday": 0
+    };
+    
+    const today = new Date();
+    const currentDay = today.getDay();
+    const scheduledDays = scheduleDays.map(day => daysMap[day]);
+    
+    // Find the next scheduled day
+    let nextDay = scheduledDays.find(day => day > currentDay);
+    if (nextDay === undefined) {
+        nextDay = scheduledDays[0]; // Wrap around to first day in schedule
+    }
+    
+    // Format for display
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    document.getElementById("nextWatering").textContent = 
+        "Next scheduled watering: " + dayNames[nextDay] + " at " + scheduleTime;
+    
+    alert("Watering schedule saved!");
+});
+
+// Auto mode toggle
+document.getElementById("autoMode").addEventListener("change", function() {
+    let wateringToggle = document.getElementById("wateringToggle");
+    
+    // Disable manual toggle when auto mode is on
+    wateringToggle.disabled = this.checked;
+    
+    if (this.checked && wateringToggle.checked) {
+        wateringToggle.checked = false;
+        document.getElementById("wateringStatus").querySelector(".badge").textContent = "Watering Off";
+        document.getElementById("wateringStatus").querySelector(".badge").className = "badge bg-secondary";
+    }
+    
+    alert(this.checked ? "Auto mode enabled" : "Auto mode disabled");
+});
+
+// Manual watering toggle
+document.getElementById("wateringToggle").addEventListener("change", function() {
+    let statusBadge = document.getElementById("wateringStatus").querySelector(".badge");
+    statusBadge.textContent = "Processing...";
+    statusBadge.className = "badge bg-warning";
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+        if (this.checked) {
+            statusBadge.textContent = "Watering On";
+            statusBadge.className = "badge bg-success";
+        } else {
+            statusBadge.textContent = "Watering Off";
+            statusBadge.className = "badge bg-secondary";
+        }
+    }, 500);
+});
+
+// Chart setup
+let sensorChart = new Chart(document.getElementById("sensorChart"), {
+    type: "line",
+    data: {
+        labels: [],
+        datasets: [
+            { label: "Soil Moisture (%)", data: [], borderColor: "#22c55e", fill: false },
+            { label: "Temperature (°C)", data: [], borderColor: "#f97316", fill: false }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+function updateChart(soilMoisture, temperature) {
+    let timeLabel = new Date().toLocaleTimeString();
+    sensorChart.data.labels.push(timeLabel);
+    sensorChart.data.datasets[0].data.push(soilMoisture);
+    sensorChart.data.datasets[1].data.push(temperature);
+    if (sensorChart.data.labels.length > 10) {
+        sensorChart.data.labels.shift();
+        sensorChart.data.datasets[0].data.shift();
+        sensorChart.data.datasets[1].data.shift();
+    }
+    sensorChart.update();
+}
+</script>
+{% endblock body %}

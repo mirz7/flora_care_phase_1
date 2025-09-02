@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block pagetitle %}
+Plant Disease Detection
+{% endblock pagetitle %}
+{% block body %}
+<style>
+  body{
+    overflow-x: hidden;
+  }
+  @media only screen and (max-width: 830px) {
+    .laptop{
+      display: none;
+    }
+  }
+  @media (min-width:830px) and (max-width: 1536px){
+    .mobile{
+      display: none;
+    }
+  }
+</style>
+<div class='mobile p-5'>
+  <div class="row mb-5 text-center text-white">
+    <div class="col-lg-10 mx-auto">
+      <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color:red;"><b>Note✍🏻</b></h1>
+      <p class="lead" style="font-weight: 500;color: black;">Please🙏 Open This Site On Laptop/PC 💻 Screen Only</p>
+      <p class="lead" style="font-weight: 500;color: black;">Thank You 🤝</p>    
+    </div>
+</div>
+</div>
+
+<div class="row mb-5 text-center text-white laptop">
+    <div class="col-lg-10 mx-auto">
+        <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color: rgb(4, 54, 4);"><b>Nurture Nature with Smart Solutions.</b></h1>
+        <p class="lead" style="font-weight: 500;color: black;">helps users identify plant diseases, learn maintenance tips, and explore plant information worldwide</p>
+    </div>
+</div>
+
+<div class="action-buttons">
+  <a href="/index" class="action-button">
+      <span>Disease Detection</span>
+  </a>
+  <a href="/get_guide" class="action-button">
+      <span>Maintenance Guide</span>
+  </a>
+</div>
+
+
+
+<style>
+  .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      align-items: center;
+      padding: 2rem 0;
+  }
+
+  .action-button {
+      position: relative;
+      padding: 1rem 2.5rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white !important;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      min-width: 280px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+  }
+
+  .action-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50px;
+      padding: 4px;
+      background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+      -webkit-mask: 
+          linear-gradient(#fff 0 0) content-box, 
+          linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: all 0.3s ease;
+  }
+
+  .action-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+  }
+
+  .action-button:hover::before {
+      opacity: 1;
+  }
+
+  .action-button:active {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+  }
+
+  .action-button span {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, #000000 0%, #333333 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      font-weight: 700;
+  }
+
+  @media (max-width: 768px) {
+      .action-button {
+          min-width: 240px;
+          padding: 0.875rem 2rem;
+          font-size: 1.1rem;
+      }
+  }
+</style>
+
+
+
+</center>
+
+{% endblock body %}

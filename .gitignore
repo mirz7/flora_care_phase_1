@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.log
+
+# Virtual environments
+env/
+.venv/
+venv/
+myenv/
+
+# Flask specific
+instance/
+*.db
+*.sqlite3
+
+# Jupyter / Notebook checkpoints
+.ipynb_checkpoints/
+
+# Data & Models
+*.h5
+*.hdf5
+*.pkl
+*.joblib
+*.ckpt
+*.pt
+*.onnx
+
+# CSV & Supplementary Data (if large or sensitive)
+*.csv
+
+# Static & Generated Files
+static/*
+!static/.gitkeep  # keep folder if needed
+
+# Images (test/demo)
+test_images/
+demo_images/
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
